@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>kiitone - Student Hub</title>
+    <title>KiitOne - Student Hub</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-100 min-h-screen font-sans text-gray-800">
@@ -113,27 +113,16 @@
     </div>
 
     <script>
-        /* =========================================
-           1. CONFIGURATION & STATE
-           ========================================= */
-        // ⚠️ Ensure this is your latest Apps Script Deployment URL!
         const REVIEW_API_URL = "https://script.google.com/macros/s/AKfycbxPtgbG_fWAyJ4abuxPjgtQqLxab44U8AMafG3K4LPGmYy7hnh1VntREJtVqzcGQEQ/exec";
-        
         const STORAGE_KEY = 'kiit_user_session_hub'; 
         
         let loggedInUser = "";
         let pendingRoll = "";
-
-        // DOM Elements
         const loginSection = document.getElementById('login-section');
         const dashboardSection = document.getElementById('dashboard-section');
         const appViewerSection = document.getElementById('app-viewer-section');
         const appFrame = document.getElementById('app-frame');
         const statusEl = document.getElementById('loginStatus');
-
-        /* =========================================
-           2. AUTO-LOGIN CHECK
-           ========================================= */
         window.addEventListener('DOMContentLoaded', () => {
             const storedSession = localStorage.getItem(STORAGE_KEY);
             if (storedSession) {
@@ -149,10 +138,6 @@
                 }
             }
         });
-
-        /* =========================================
-           3. AUTHENTICATION LOGIC (OTP System)
-           ========================================= */
         function sendOtp() {
             const rollInput = document.getElementById('kiitRoll');
             const btn = document.getElementById('btn-send-otp');
@@ -248,35 +233,24 @@
             document.getElementById('otpInput').value = "";
             showStatus("", "");
         }
-
         function logoutStudent() {
             localStorage.removeItem(STORAGE_KEY);
             location.reload();
         }
-
-        /* =========================================
-           4. UI & DATA HELPERS
-           ========================================= */
         function updateDashboardUI(name) {
             loginSection.classList.add('hidden');
             dashboardSection.classList.remove('hidden');
             document.getElementById('welcome-message').innerText = `Welcome, ${name}`;
         }
-
         function showStatus(msg, colorClass) {
             statusEl.innerText = msg;
             statusEl.className = `mt-4 text-sm font-medium min-h-[20px] ${colorClass}`;
         }
-
-        /* =========================================
-           5. APP VIEWER LOGIC (IFRAME)
-           ========================================= */
         function openApp(url) {
             dashboardSection.classList.add('hidden');
             appViewerSection.classList.remove('hidden');
             appFrame.src = url; 
         }
-
         function closeApp() {
             appViewerSection.classList.add('hidden');
             dashboardSection.classList.remove('hidden');
