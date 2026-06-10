@@ -8,63 +8,89 @@
 </head>
 <body class="bg-gray-100 min-h-screen font-sans text-gray-800">
 
-    <div id="login-section" class="flex items-center justify-center min-h-screen">
+    <div id="login-section" class="flex items-center justify-center min-h-screen transition-opacity duration-300">
         <div class="bg-white p-8 rounded-lg shadow-md w-full max-w-md text-center">
             <h1 class="text-3xl font-bold text-blue-600 mb-2">kiitone</h1>
-            <p class="text-gray-500 mb-6">Enter your @kiit.ac.in email to access the hub.</p>
+            <p class="text-gray-500 mb-6">Student Hub Verification Required</p>
             
-            <form id="login-form" class="space-y-4">
+            <div id="step-1-roll" class="space-y-4">
                 <input 
-                    type="email" 
-                    id="email-input" 
-                    placeholder="student@kiit.ac.in" 
-                    required
-                    class="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    type="number" 
+                    id="kiitRoll" 
+                    placeholder="Enter Roll Number (e.g. 2105123)" 
+                    class="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 appearance-none"
                 >
                 <button 
-                    type="submit" 
-                    class="w-full bg-blue-600 text-white font-semibold py-2 rounded-md hover:bg-blue-700 transition"
+                    id="btn-send-otp"
+                    onclick="sendOtp()" 
+                    class="w-full bg-blue-600 text-white font-semibold py-2 rounded-md hover:bg-blue-700 transition disabled:bg-gray-400 disabled:cursor-not-allowed"
                 >
                     Send Verification Code
                 </button>
-            </form>
-            <p id="message" class="mt-4 text-sm text-red-500 hidden">Please use a valid college email.</p>
+            </div>
+
+            <div id="step-2-otp" class="hidden space-y-4">
+                <p class="text-sm text-gray-500">
+                    OTP sent to <span id="display-email" class="font-bold text-gray-700"></span>
+                </p>
+                <input 
+                    type="number" 
+                    id="otpInput" 
+                    placeholder="Enter 6-digit OTP" 
+                    class="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 tracking-widest text-center"
+                >
+                <button 
+                    id="btn-verify-otp"
+                    onclick="verifyOtp()" 
+                    class="w-full bg-green-500 text-white font-semibold py-2 rounded-md hover:bg-green-600 transition disabled:bg-gray-400 disabled:cursor-not-allowed"
+                >
+                    Verify & Login
+                </button>
+                <button onclick="resetLogin()" class="text-sm text-blue-500 hover:text-blue-700 underline mt-2">
+                    Change Roll Number
+                </button>
+            </div>
+
+            <p id="loginStatus" class="mt-4 text-sm font-medium min-h-[20px]"></p>
         </div>
     </div>
 
-    <div id="dashboard-section" class="hidden min-h-screen p-8 max-w-4xl mx-auto flex flex-col">
-        <div class="flex justify-between items-center mb-8">
-            <h1 class="text-3xl font-bold text-blue-600">kiitone Dashboard</h1>
-            <button id="logout-btn" class="text-sm text-gray-500 hover:text-red-500 transition">Log Out</button>
+    <div id="dashboard-section" class="hidden min-h-screen p-8 max-w-4xl mx-auto flex flex-col transition-opacity duration-300">
+        <div class="flex justify-between items-center mb-8 bg-white p-6 rounded-lg shadow-sm border-b-4 border-blue-500">
+            <div>
+                <h1 class="text-3xl font-bold text-blue-600">kiitone Dashboard</h1>
+                <p id="welcome-message" class="text-gray-500 text-sm mt-1">Welcome, Student</p>
+            </div>
+            <button onclick="logoutStudent()" class="text-sm font-semibold text-gray-500 hover:text-red-500 transition px-4 py-2 border rounded-md hover:border-red-500 hover:bg-red-50">
+                Log Out
+            </button>
         </div>
         
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 flex-grow">
-            
-            <button onclick="openApp('https://kiitfaculty.vercel.app/')" class="text-left block bg-white p-6 rounded-lg shadow hover:shadow-lg transition border-t-4 border-purple-500 w-full">
-                <h2 class="text-xl font-semibold mb-2">Faculty Review</h2>
+            <button onclick="openApp('https://kiitfaculty.vercel.app/')" class="text-left block bg-white p-6 rounded-lg shadow hover:shadow-lg transition border-t-4 border-purple-500 w-full transform hover:-translate-y-1">
+                <h2 class="text-xl font-semibold mb-2 text-gray-800">Faculty Review</h2>
                 <p class="text-gray-500 text-sm">Read and write anonymous reviews for your professors.</p>
             </button>
 
-            <button onclick="openApp('https://kiitresources.vercel.app/')" class="text-left block bg-white p-6 rounded-lg shadow hover:shadow-lg transition border-t-4 border-blue-500 w-full">
-                <h2 class="text-xl font-semibold mb-2">Study Material</h2>
+            <button onclick="openApp('https://kiitresources.vercel.app/')" class="text-left block bg-white p-6 rounded-lg shadow hover:shadow-lg transition border-t-4 border-blue-500 w-full transform hover:-translate-y-1">
+                <h2 class="text-xl font-semibold mb-2 text-gray-800">Study Material</h2>
                 <p class="text-gray-500 text-sm">Access previous year papers, notes, and assignments.</p>
             </button>
 
-            <button onclick="openApp('https://kiitcalendar.vercel.app/')" class="text-left block bg-white p-6 rounded-lg shadow hover:shadow-lg transition border-t-4 border-green-500 w-full">
-                <h2 class="text-xl font-semibold mb-2">Academic Calendar</h2>
+            <button onclick="openApp('https://kiitcalendar.vercel.app/')" class="text-left block bg-white p-6 rounded-lg shadow hover:shadow-lg transition border-t-4 border-green-500 w-full transform hover:-translate-y-1">
+                <h2 class="text-xl font-semibold mb-2 text-gray-800">Academic Calendar</h2>
                 <p class="text-gray-500 text-sm">Track important exam dates and college holidays.</p>
             </button>
 
-            <button onclick="openApp('https://kiitgpacalculator.vercel.app/')" class="text-left block bg-white p-6 rounded-lg shadow hover:shadow-lg transition border-t-4 border-yellow-500 w-full">
-                <h2 class="text-xl font-semibold mb-2">GPA Calculator</h2>
+            <button onclick="openApp('https://kiitgpacalculator.vercel.app/')" class="text-left block bg-white p-6 rounded-lg shadow hover:shadow-lg transition border-t-4 border-yellow-500 w-full transform hover:-translate-y-1">
+                <h2 class="text-xl font-semibold mb-2 text-gray-800">GPA Calculator</h2>
                 <p class="text-gray-500 text-sm">Calculate your SGPA and CGPA easily.</p>
             </button>
 
-            <button onclick="openApp('https://kiitroutine.vercel.app/')" class="text-left block bg-white p-6 rounded-lg shadow hover:shadow-lg transition border-t-4 border-red-500 w-full">
-                <h2 class="text-xl font-semibold mb-2">Class Routine</h2>
+            <button onclick="openApp('https://kiitroutine.vercel.app/')" class="text-left block bg-white p-6 rounded-lg shadow hover:shadow-lg transition border-t-4 border-red-500 w-full transform hover:-translate-y-1">
+                <h2 class="text-xl font-semibold mb-2 text-gray-800">Class Routine</h2>
                 <p class="text-gray-500 text-sm">Check your daily lecture schedule and room numbers.</p>
             </button>
-
         </div>
 
         <footer class="mt-12 text-center text-gray-400 text-sm">
@@ -73,8 +99,8 @@
     </div>
 
     <div id="app-viewer-section" class="hidden h-screen w-full flex flex-col bg-gray-100">
-        <div class="bg-white shadow-sm px-6 py-4 flex items-center justify-between">
-            <button onclick="closeApp()" class="text-blue-600 font-semibold hover:text-blue-800 flex items-center gap-2 transition">
+        <div class="bg-white shadow-sm px-6 py-4 flex items-center justify-between z-10">
+            <button onclick="closeApp()" class="text-blue-600 font-semibold hover:text-blue-800 flex items-center gap-2 transition bg-blue-50 px-4 py-2 rounded-md">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                     <path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd" />
                 </svg>
@@ -87,49 +113,206 @@
     </div>
 
     <script>
+        /* =========================================
+           1. CONFIGURATION & STATE
+           ========================================= */
+        const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQsPVXkzWu4PV0LRpap9D_6y9_mGVa2HQmPcpg2GLxCDpEHC0fJEK_PG9eDbvbh6F1eCjGkcgI1ljQ5/pub?output=csv";
+        const REVIEW_API_URL = "https://script.google.com/macros/s/AKfycbxPtgbG_fWAyJ4abuxPjgtQqLxab44U8AMafG3K4LPGmYy7hnh1VntREJtVqzcGQEQ/exec";
+        const STORAGE_KEY = 'kiit_user_session_hub'; // Changed slightly to avoid conflict with faculty review site
+        
+        let loggedInUser = "";
+        let pendingRoll = "";
+
         // DOM Elements
         const loginSection = document.getElementById('login-section');
         const dashboardSection = document.getElementById('dashboard-section');
         const appViewerSection = document.getElementById('app-viewer-section');
-        const loginForm = document.getElementById('login-form');
-        const emailInput = document.getElementById('email-input');
-        const message = document.getElementById('message');
-        const logoutBtn = document.getElementById('logout-btn');
         const appFrame = document.getElementById('app-frame');
+        const statusEl = document.getElementById('loginStatus');
 
-        // Login Logic
-        loginForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            const email = emailInput.value.trim();
-
-            if (email.endsWith('@kiit.ac.in')) {
-                loginSection.classList.add('hidden');
-                dashboardSection.classList.remove('hidden');
-            } else {
-                message.classList.remove('hidden');
-                message.innerText = "Error: You must use a @kiit.ac.in email address.";
+        /* =========================================
+           2. AUTO-LOGIN CHECK
+           ========================================= */
+        window.addEventListener('DOMContentLoaded', () => {
+            const storedSession = localStorage.getItem(STORAGE_KEY);
+            if (storedSession) {
+                try {
+                    const userData = JSON.parse(storedSession);
+                    if(userData && userData.roll) {
+                        loggedInUser = userData.roll;
+                        updateDashboardUI(userData.name, userData.email);
+                    }
+                } catch (e) {
+                    console.error("Local storage parsing error, resetting session.", e);
+                    localStorage.removeItem(STORAGE_KEY);
+                }
             }
         });
 
-        // Logout Logic
-        logoutBtn.addEventListener('click', () => {
-            dashboardSection.classList.add('hidden');
-            loginSection.classList.remove('hidden');
-            emailInput.value = ''; 
-        });
+        /* =========================================
+           3. AUTHENTICATION LOGIC (OTP System)
+           ========================================= */
+        function sendOtp() {
+            const rollInput = document.getElementById('kiitRoll');
+            const btn = document.getElementById('btn-send-otp');
+            const roll = rollInput.value.trim();
+            
+            if (roll.length < 5) {
+                showStatus("Invalid Roll Number", "text-red-500");
+                return;
+            }
 
-        // Open External Site in Iframe
+            btn.disabled = true;
+            btn.innerText = "Sending...";
+            showStatus("", "");
+
+            fetch(REVIEW_API_URL, {
+                method: "POST",
+                body: JSON.stringify({ action: 'send_otp', roll: roll })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.result === 'success') {
+                    pendingRoll = roll;
+                    document.getElementById('step-1-roll').classList.add('hidden');
+                    document.getElementById('step-2-otp').classList.remove('hidden');
+                    document.getElementById('display-email').innerText = roll + "@kiit.ac.in";
+                    showStatus("OTP sent to your KIIT email.", "text-green-500");
+                } else {
+                    throw new Error(data.error || "Failed to send");
+                }
+            })
+            .catch(err => {
+                console.error("OTP Error:", err);
+                showStatus("Error sending OTP. Check network.", "text-red-500");
+                btn.disabled = false;
+                btn.innerText = "Send Verification Code";
+            });
+        }
+
+        function verifyOtp() {
+            const otpInput = document.getElementById('otpInput');
+            const btn = document.getElementById('btn-verify-otp');
+            const otp = otpInput.value.trim();
+            
+            if (otp.length < 6) {
+                showStatus("Enter 6-digit OTP", "text-red-500");
+                return;
+            }
+
+            btn.disabled = true;
+            btn.innerText = "Verifying...";
+
+            fetch(REVIEW_API_URL, {
+                method: "POST",
+                body: JSON.stringify({ action: 'verify_otp', roll: pendingRoll, otp: otp })
+            })
+            .then(res => res.json())
+            .then(async data => {
+                if (data.result === 'success') {
+                    let name = "Student " + pendingRoll;
+                    const email = pendingRoll + "@kiit.ac.in";
+
+                    const sessionData = {
+                        roll: pendingRoll,
+                        name: name,
+                        email: email,
+                        isVerified: true
+                    };
+
+                    localStorage.setItem(STORAGE_KEY, JSON.stringify(sessionData));
+                    loggedInUser = pendingRoll;
+                    updateDashboardUI(name, email);
+
+                    // Fetch actual name from CSV in background
+                    getStudentDataFromSheet(pendingRoll).then(studentData => {
+                        if (studentData && studentData.name) {
+                            sessionData.name = studentData.name;
+                            localStorage.setItem(STORAGE_KEY, JSON.stringify(sessionData));
+                            document.getElementById('welcome-message').innerText = `Welcome, ${studentData.name}`;
+                        }
+                    });
+                } else {
+                    showStatus(data.error || "Invalid OTP", "text-red-500");
+                    btn.disabled = false;
+                    btn.innerText = "Verify & Login";
+                }
+            })
+            .catch(err => {
+                console.error("Verification Error:", err);
+                showStatus("Verification failed. Check connection.", "text-red-500");
+                btn.disabled = false;
+                btn.innerText = "Verify & Login";
+            });
+        }
+
+        function resetLogin() {
+            document.getElementById('step-1-roll').classList.remove('hidden');
+            document.getElementById('step-2-otp').classList.add('hidden');
+            document.getElementById('btn-send-otp').disabled = false;
+            document.getElementById('btn-send-otp').innerText = "Send Verification Code";
+            document.getElementById('otpInput').value = "";
+            showStatus("", "");
+        }
+
+        function logoutStudent() {
+            localStorage.removeItem(STORAGE_KEY);
+            location.reload();
+        }
+
+        /* =========================================
+           4. UI & DATA HELPERS
+           ========================================= */
+        function updateDashboardUI(name, email) {
+            loginSection.classList.add('hidden');
+            dashboardSection.classList.remove('hidden');
+            document.getElementById('welcome-message').innerText = `Welcome, ${name}`;
+        }
+
+        function showStatus(msg, colorClass) {
+            statusEl.innerText = msg;
+            statusEl.className = `mt-4 text-sm font-medium min-h-[20px] ${colorClass}`;
+        }
+
+        async function getStudentDataFromSheet(inputRoll) {
+            try {
+                const response = await fetch(CSV_URL);
+                if (!response.ok) throw new Error("Network response was not ok");
+                const text = await response.text();
+                const rows = text.split('\n');
+                
+                for (let i = 0; i < rows.length; i++) {
+                    const row = rows[i].split(',');
+                    if(row.length >= 3) {
+                        const sheetRoll = row[0].replace(/"/g, '').trim();
+                        if (sheetRoll === inputRoll) {
+                            return {
+                                name: row[1].replace(/"/g, '').trim(),
+                                email: row[2].replace(/"/g, '').trim()
+                            };
+                        }
+                    }
+                }
+                return null; 
+            } catch (err) { 
+                console.warn("Failed to load user sheet data:", err);
+                return null; 
+            }
+        }
+
+        /* =========================================
+           5. APP VIEWER LOGIC (IFRAME)
+           ========================================= */
         function openApp(url) {
             dashboardSection.classList.add('hidden');
             appViewerSection.classList.remove('hidden');
-            appFrame.src = url; // Load the specific website
+            appFrame.src = url; 
         }
 
-        // Close External Site and return to Dashboard
         function closeApp() {
             appViewerSection.classList.add('hidden');
             dashboardSection.classList.remove('hidden');
-            appFrame.src = ""; // Clear the iframe to stop it running in background
+            appFrame.src = ""; 
         }
     </script>
 </body>
