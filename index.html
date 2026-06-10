@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>kiitone - Student Hub</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen font-sans text-gray-800">
+
+    <div id="login-section" class="flex items-center justify-center min-h-screen">
+        <div class="bg-white p-8 rounded-lg shadow-md w-full max-w-md text-center">
+            <h1 class="text-3xl font-bold text-blue-600 mb-2">kiitone</h1>
+            <p class="text-gray-500 mb-6">Enter your @kiit.ac.in email to access the hub.</p>
+            
+            <form id="login-form" class="space-y-4">
+                <input 
+                    type="email" 
+                    id="email-input" 
+                    placeholder="student@kiit.ac.in" 
+                    required
+                    class="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                <button 
+                    type="submit" 
+                    class="w-full bg-blue-600 text-white font-semibold py-2 rounded-md hover:bg-blue-700 transition"
+                >
+                    Send Verification Code
+                </button>
+            </form>
+            <p id="message" class="mt-4 text-sm text-red-500 hidden">Please use a valid college email.</p>
+        </div>
+    </div>
+
+    <div id="dashboard-section" class="hidden min-h-screen p-8 max-w-4xl mx-auto flex flex-col">
+        <div class="flex justify-between items-center mb-8">
+            <h1 class="text-3xl font-bold text-blue-600">kiitone Dashboard</h1>
+            <button id="logout-btn" class="text-sm text-gray-500 hover:text-red-500 transition">Log Out</button>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 flex-grow">
+            
+            <button onclick="openApp('https://kiitfaculty.vercel.app/')" class="text-left block bg-white p-6 rounded-lg shadow hover:shadow-lg transition border-t-4 border-purple-500 w-full">
+                <h2 class="text-xl font-semibold mb-2">Faculty Review</h2>
+                <p class="text-gray-500 text-sm">Read and write anonymous reviews for your professors.</p>
+            </button>
+
+            <button onclick="openApp('https://kiitresources.vercel.app/')" class="text-left block bg-white p-6 rounded-lg shadow hover:shadow-lg transition border-t-4 border-blue-500 w-full">
+                <h2 class="text-xl font-semibold mb-2">Study Material</h2>
+                <p class="text-gray-500 text-sm">Access previous year papers, notes, and assignments.</p>
+            </button>
+
+            <button onclick="openApp('https://kiitcalendar.vercel.app/')" class="text-left block bg-white p-6 rounded-lg shadow hover:shadow-lg transition border-t-4 border-green-500 w-full">
+                <h2 class="text-xl font-semibold mb-2">Academic Calendar</h2>
+                <p class="text-gray-500 text-sm">Track important exam dates and college holidays.</p>
+            </button>
+
+            <button onclick="openApp('https://kiitgpacalculator.vercel.app/')" class="text-left block bg-white p-6 rounded-lg shadow hover:shadow-lg transition border-t-4 border-yellow-500 w-full">
+                <h2 class="text-xl font-semibold mb-2">GPA Calculator</h2>
+                <p class="text-gray-500 text-sm">Calculate your SGPA and CGPA easily.</p>
+            </button>
+
+            <button onclick="openApp('https://kiitroutine.vercel.app/')" class="text-left block bg-white p-6 rounded-lg shadow hover:shadow-lg transition border-t-4 border-red-500 w-full">
+                <h2 class="text-xl font-semibold mb-2">Class Routine</h2>
+                <p class="text-gray-500 text-sm">Check your daily lecture schedule and room numbers.</p>
+            </button>
+
+        </div>
+
+        <footer class="mt-12 text-center text-gray-400 text-sm">
+            Made by Bhai Virendra
+        </footer>
+    </div>
+
+    <div id="app-viewer-section" class="hidden h-screen w-full flex flex-col bg-gray-100">
+        <div class="bg-white shadow-sm px-6 py-4 flex items-center justify-between">
+            <button onclick="closeApp()" class="text-blue-600 font-semibold hover:text-blue-800 flex items-center gap-2 transition">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd" />
+                </svg>
+                Back to Dashboard
+            </button>
+            <h1 class="text-lg font-bold text-gray-700">kiitone</h1>
+        </div>
+        
+        <iframe id="app-frame" src="" class="w-full flex-grow border-none"></iframe>
+    </div>
+
+    <script>
+        // DOM Elements
+        const loginSection = document.getElementById('login-section');
+        const dashboardSection = document.getElementById('dashboard-section');
+        const appViewerSection = document.getElementById('app-viewer-section');
+        const loginForm = document.getElementById('login-form');
+        const emailInput = document.getElementById('email-input');
+        const message = document.getElementById('message');
+        const logoutBtn = document.getElementById('logout-btn');
+        const appFrame = document.getElementById('app-frame');
+
+        // Login Logic
+        loginForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const email = emailInput.value.trim();
+
+            if (email.endsWith('@kiit.ac.in')) {
+                loginSection.classList.add('hidden');
+                dashboardSection.classList.remove('hidden');
+            } else {
+                message.classList.remove('hidden');
+                message.innerText = "Error: You must use a @kiit.ac.in email address.";
+            }
+        });
+
+        // Logout Logic
+        logoutBtn.addEventListener('click', () => {
+            dashboardSection.classList.add('hidden');
+            loginSection.classList.remove('hidden');
+            emailInput.value = ''; 
+        });
+
+        // Open External Site in Iframe
+        function openApp(url) {
+            dashboardSection.classList.add('hidden');
+            appViewerSection.classList.remove('hidden');
+            appFrame.src = url; // Load the specific website
+        }
+
+        // Close External Site and return to Dashboard
+        function closeApp() {
+            appViewerSection.classList.add('hidden');
+            dashboardSection.classList.remove('hidden');
+            appFrame.src = ""; // Clear the iframe to stop it running in background
+        }
+    </script>
+</body>
+</html>
