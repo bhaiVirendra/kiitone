@@ -116,9 +116,10 @@
         /* =========================================
            1. CONFIGURATION & STATE
            ========================================= */
-        const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQsPVXkzWu4PV0LRpap9D_6y9_mGVa2HQmPcpg2GLxCDpEHC0fJEK_PG9eDbvbh6F1eCjGkcgI1ljQ5/pub?output=csv";
+        // ⚠️ Ensure this is your latest Apps Script Deployment URL!
         const REVIEW_API_URL = "https://script.google.com/macros/s/AKfycbxPtgbG_fWAyJ4abuxPjgtQqLxab44U8AMafG3K4LPGmYy7hnh1VntREJtVqzcGQEQ/exec";
-        const STORAGE_KEY = 'kiit_user_session_hub'; // Changed slightly to avoid conflict with faculty review site
+        
+        const STORAGE_KEY = 'kiit_user_session_hub'; 
         
         let loggedInUser = "";
         let pendingRoll = "";
@@ -140,7 +141,7 @@
                     const userData = JSON.parse(storedSession);
                     if(userData && userData.roll) {
                         loggedInUser = userData.roll;
-                        updateDashboardUI(userData.name, userData.email);
+                        updateDashboardUI(userData.name);
                     }
                 } catch (e) {
                     console.error("Local storage parsing error, resetting session.", e);
@@ -208,10 +209,11 @@
                 body: JSON.stringify({ action: 'verify_otp', roll: pendingRoll, otp: otp })
             })
             .then(res => res.json())
-            .then(async data => {
+            .then(data => {
                 if (data.result === 'success') {
-                    let name = "Student " + pendingRoll;
-                    const email = pendingRoll + "@kiit.ac.in";
+                    // Pull the securely fetched data sent by the backend
+                    const name = data.name || ("Student " + pendingRoll);
+                    const email = data.email || (pendingRoll + "@kiit.ac.in");
 
                     const sessionData = {
                         roll: pendingRoll,
@@ -222,16 +224,8 @@
 
                     localStorage.setItem(STORAGE_KEY, JSON.stringify(sessionData));
                     loggedInUser = pendingRoll;
-                    updateDashboardUI(name, email);
-
-                    // Fetch actual name from CSV in background
-                    getStudentDataFromSheet(pendingRoll).then(studentData => {
-                        if (studentData && studentData.name) {
-                            sessionData.name = studentData.name;
-                            localStorage.setItem(STORAGE_KEY, JSON.stringify(sessionData));
-                            document.getElementById('welcome-message').innerText = `Welcome, ${studentData.name}`;
-                        }
-                    });
+                    
+                    updateDashboardUI(name);
                 } else {
                     showStatus(data.error || "Invalid OTP", "text-red-500");
                     btn.disabled = false;
@@ -263,7 +257,7 @@
         /* =========================================
            4. UI & DATA HELPERS
            ========================================= */
-        function updateDashboardUI(name, email) {
+        function updateDashboardUI(name) {
             loginSection.classList.add('hidden');
             dashboardSection.classList.remove('hidden');
             document.getElementById('welcome-message').innerText = `Welcome, ${name}`;
@@ -272,32 +266,6 @@
         function showStatus(msg, colorClass) {
             statusEl.innerText = msg;
             statusEl.className = `mt-4 text-sm font-medium min-h-[20px] ${colorClass}`;
-        }
-
-        async function getStudentDataFromSheet(inputRoll) {
-            try {
-                const response = await fetch(CSV_URL);
-                if (!response.ok) throw new Error("Network response was not ok");
-                const text = await response.text();
-                const rows = text.split('\n');
-                
-                for (let i = 0; i < rows.length; i++) {
-                    const row = rows[i].split(',');
-                    if(row.length >= 3) {
-                        const sheetRoll = row[0].replace(/"/g, '').trim();
-                        if (sheetRoll === inputRoll) {
-                            return {
-                                name: row[1].replace(/"/g, '').trim(),
-                                email: row[2].replace(/"/g, '').trim()
-                            };
-                        }
-                    }
-                }
-                return null; 
-            } catch (err) { 
-                console.warn("Failed to load user sheet data:", err);
-                return null; 
-            }
         }
 
         /* =========================================
