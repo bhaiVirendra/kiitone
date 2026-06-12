@@ -157,7 +157,7 @@
 
     <script>
         // 🚨 SECURE MASTER API URL CONNECTED 🚨
-        const MASTER_API_URL = "https://script.google.com/macros/s/AKfycbwLWZd0BlCiRWDAczGhe7pRbVwYe_PVHrON8Z8kjYg3yWKGHgPQI1MHFbOOE4x9Irk8/exec";
+        const MASTER_API_URL = "https://script.google.com/macros/s/AKfycbzcFcdufCm7FUhJr1X3yp1bN6E18pGcvT0fnPAqgSpWa_chtoYNf0l7d8q0yTcjUTqK/exec";
         
         const STORAGE_KEY = 'kiit_user_session_hub'; 
         
@@ -220,7 +220,12 @@
             })
             .catch(err => {
                 console.error("OTP Error:", err);
-                showStatus("Error sending OTP. Check network.", "text-red-500");
+                // Improved Error Message
+                const errorMsg = err.message === "Failed to fetch" 
+                    ? "Network Error. Is your internet connected?" 
+                    : err.message;
+                showStatus("Error: " + errorMsg, "text-red-500");
+                
                 btn.disabled = false;
                 btn.innerText = "Send Verification Code";
             });
@@ -271,7 +276,11 @@
             })
             .catch(err => {
                 console.error("Verification Error:", err);
-                showStatus("Verification failed. Check connection.", "text-red-500");
+                const errorMsg = err.message === "Failed to fetch" 
+                    ? "Network Error. Check connection." 
+                    : err.message;
+                showStatus("Error: " + errorMsg, "text-red-500");
+                
                 btn.disabled = false;
                 btn.innerText = "Verify & Login";
             });
