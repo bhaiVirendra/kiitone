@@ -18,7 +18,7 @@
                 <input 
                     type="number" 
                     id="kiitRoll" 
-                    placeholder="Enter Roll Number (e.g. 2105123)" 
+                    placeholder="Enter Roll Number (e.g. 240517)" 
                     class="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 appearance-none"
                 >
                 <button 
@@ -156,14 +156,13 @@
     </div>
 
     <script>
+        const MASTER_API_URL = "https://script.google.com/macros/s/AKfycby_K4qZMCMu6NIeoVUqBpgztC1WnCVrji3GIc5j7m1Hewcly7iGa2tqNsvHtlraB__G/exec";
         
-        const REVIEW_API_URL = "https://script.google.com/macros/s/AKfycbyCjWd111JS0Vdpia972RaKKNQitZe2WEGh0W8f9ChKIKn8shTN6uhwZKc2jVBmlA4X/exec";
         const STORAGE_KEY = 'kiit_user_session_hub'; 
         
         let loggedInUser = "";
         let pendingRoll = "";
         
-        // DOM Elements
         const loginSection = document.getElementById('login-section');
         const dashboardSection = document.getElementById('dashboard-section');
         const appViewerSection = document.getElementById('app-viewer-section');
@@ -177,7 +176,6 @@
                     const userData = JSON.parse(storedSession);
                     if(userData && userData.roll) {
                         loggedInUser = userData.roll;
-                        // Pass the entire user data object to populate the profile
                         updateDashboardUI(userData);
                     }
                 } catch (e) {
@@ -201,7 +199,7 @@
             btn.innerText = "Sending...";
             showStatus("", "");
 
-            fetch(REVIEW_API_URL, {
+            fetch(MASTER_API_URL, {
                 method: "POST",
                 body: JSON.stringify({ action: 'send_otp', roll: roll })
             })
@@ -236,30 +234,31 @@
             }
 
             btn.disabled = true;
-            btn.innerText = "Verifying...";
+            btn.innerText = "Verifying & Loading Profile...";
 
-            fetch(REVIEW_API_URL, {
+            fetch(MASTER_API_URL, {
                 method: "POST",
                 body: JSON.stringify({ action: 'verify_otp', roll: pendingRoll, otp: otp })
             })
             .then(res => res.json())
             .then(data => {
                 if (data.result === 'success') {
-                    const name = data.name || ("Student " + pendingRoll);
-                    const email = data.email || (pendingRoll + "@kiit.ac.in");
-
+                    
+                    // The server already fetched the real name and email for us
                     const sessionData = {
                         roll: pendingRoll,
-                        name: name,
-                        email: email,
+                        name: data.name,
+                        email: data.email,
                         isVerified: true
                     };
 
+                    // Save to local storage for future visits
                     localStorage.setItem(STORAGE_KEY, JSON.stringify(sessionData));
                     loggedInUser = pendingRoll;
                     
-                    // Pass the newly created session object to populate the profile
+                    // Load Dashboard instantly
                     updateDashboardUI(sessionData);
+
                 } else {
                     showStatus(data.error || "Invalid OTP", "text-red-500");
                     btn.disabled = false;
@@ -313,21 +312,18 @@
             dashboardSection.classList.remove('hidden');
             dashboardSection.classList.add('flex');
             
-            // Populate text fields
-            document.getElementById('welcome-message').innerText = `Welcome, ${userData.name}`;
+            // Capitalized for the main welcome header
+            document.getElementById('welcome-message').innerText = `WELCOME, ${userData.name.toUpperCase()}`;
             document.getElementById('profile-name').innerText = userData.name;
             document.getElementById('profile-roll').innerText = userData.roll;
             
-            // Populate email, short name, and initial
             if (document.getElementById('profile-email')) {
                 document.getElementById('profile-email').innerText = userData.email || `${userData.roll}@kiit.ac.in`;
             }
             if (document.getElementById('nav-name')) {
-                // Just show their first name on the navbar
                 document.getElementById('nav-name').innerText = userData.name.split(' ')[0]; 
             }
             if (document.getElementById('nav-initial')) {
-                // Show the first letter of their name in the avatar
                 document.getElementById('nav-initial').innerText = userData.name.charAt(0).toUpperCase();
             }
         }
